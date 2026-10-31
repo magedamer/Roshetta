@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roshetta | روشتة — Pharmacy Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap">
+<style>
+:root{
+  --bg:#f3f7f6;--bg2:#e9f1ef;--card:#ffffff;--card2:#f8fbfa;--fg:#10302b;--muted:#5f7a75;--line:#dbe8e5;
+  --p:#0f9d7a;--p2:#14c59a;--pd:#0a6f56;--acc:#6c5ce7;--warn:#f59e0b;--bad:#e5484d;--ok:#16a34a;--info:#0ea5e9;
+  --r:18px;--sh:0 1px 2px rgba(16,48,43,.05),0 8px 28px rgba(16,48,43,.07);--sb:#0b2b26;--sbfg:#cfe5df;
+  --font:'Tajawal','Inter',system-ui,sans-serif;
+}
+[data-theme=dark]{
+  --bg:#0a1514;--bg2:#0f1d1b;--card:#12231f;--card2:#162a26;--fg:#e6f3f0;--muted:#8fb0a9;--line:#22403a;
+  --sh:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);--sb:#071a17;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--bg);color:var(--fg);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+[dir=ltr] body{font-family:'Inter','Tajawal',system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+.ic{width:1.15em;height:1.15em;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.2em}
+/* layout */
+#app{display:grid;grid-template-columns:260px 1fr;height:100vh}
+aside{background:linear-gradient(180deg,var(--sb),#06201c);color:var(--sbfg);display:flex;flex-direction:column;padding:18px 14px;overflow:auto;position:relative;z-index:30}
+.brand{display:flex;align-items:center;gap:12px;padding:6px 8px 20px}
+.logo{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--p2),var(--p));display:grid;place-items:center;color:#fff;box-shadow:0 6px 18px rgba(20,197,154,.4)}
+.logo .ic{width:24px;height:24px}
+.brand b{font-size:21px;color:#fff;letter-spacing:.2px;display:block;line-height:1.1}
+.brand small{font-size:11.5px;opacity:.7}
+nav{display:flex;flex-direction:column;gap:3px;flex:1}
+nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;color:var(--sbfg);text-decoration:none;font-weight:500;transition:.18s;cursor:pointer}
+nav a:hover{background:rgba(255,255,255,.07)}
+nav a.on{background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;box-shadow:0 6px 16px rgba(15,157,122,.35)}
+nav a .badge{margin-inline-start:auto}
+.sbfoot{margin-top:14px;padding:12px;border-radius:14px;background:rgba(255,255,255,.06);font-size:13px;display:flex;gap:10px;align-items:center}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--p));display:grid;place-items:center;color:#fff;font-weight:700;flex:none}
+main{display:flex;flex-direction:column;min-width:0;height:100vh}
+header.top{display:flex;align-items:center;gap:12px;padding:14px 26px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+header.top h1{font-size:22px;font-weight:800;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{width:42px;height:42px;border-radius:12px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;position:relative;transition:.15s;color:var(--fg)}
+.iconbtn:hover{border-color:var(--p);color:var(--p)}
+.iconbtn .dot{position:absolute;top:-5px;inset-inline-end:-5px;background:var(--bad);color:#fff;font-size:10.5px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;font-weight:700;padding:0 4px}
+#view{flex:1;overflow:auto;padding:24px 26px 40px}
+.menu-btn{display:none}
+/* components */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:20px}
+.card h3{font-size:16.5px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.grid{display:grid;gap:18px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.kpi{display:flex;gap:14px;align-items:center;position:relative;overflow:hidden}
+.kpi .k-ic{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;color:#fff;flex:none}
+.kpi .k-ic .ic{width:24px;height:24px}
+.kpi small{color:var(--muted);font-weight:500;display:block}
+.kpi b{font-size:23px;font-weight:800;display:block;line-height:1.2}
+.kpi::after{content:"";position:absolute;inset-inline-end:-30px;top:-30px;width:100px;height:100px;border-radius:50%;background:var(--kc,var(--p));opacity:.08}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;border-radius:12px;font-weight:700;background:var(--card);border:1px solid var(--line);transition:.15s;white-space:nowrap}
+.btn:hover{border-color:var(--p);color:var(--p)}
+.btn.p{background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(15,157,122,.3)}
+.btn.p:hover{filter:brightness(1.07);color:#fff}
+.btn.d{background:var(--bad);color:#fff;border-color:transparent}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:9px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{width:100%;padding:10px 13px;border-radius:12px;border:1px solid var(--line);background:var(--card2);transition:.15s}
+input:focus,select:focus,textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px color-mix(in srgb,var(--p) 18%,transparent);outline:0}
+label.f{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:5px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.fg .full{grid-column:1/-1}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.bar .grow{flex:1;min-width:200px}
+.sw{position:relative}
+.sw .ic{position:absolute;inset-inline-start:13px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.sw input{padding-inline-start:40px}
+table{width:100%;border-collapse:collapse}
+.tw{overflow:auto;border-radius:14px;border:1px solid var(--line);background:var(--card)}
+th{font-size:12.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:700;text-align:start;padding:12px 14px;background:var(--card2);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--card2)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--bg2);color:var(--muted)}
+.badge.ok{background:#16a34a22;color:var(--ok)}.badge.warn{background:#f59e0b22;color:#c77d05}.badge.bad{background:#e5484d22;color:var(--bad)}.badge.info{background:#0ea5e922;color:var(--info)}.badge.acc{background:#6c5ce722;color:var(--acc)}
+[data-theme=dark] .badge.warn{color:#fbbf24}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:13.5px;transition:.15s}
+.chip.on,.chip:hover{background:var(--p);color:#fff;border-color:var(--p)}
+.muted{color:var(--muted)}.right{text-align:end}.b{font-weight:700}.nowrap{white-space:nowrap}
+.row{display:flex;gap:10px;align-items:center}.sp{flex:1}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+.list-i{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.list-i:last-child{border:0}
+.pbar{height:8px;border-radius:9px;background:var(--bg2);overflow:hidden;flex:1}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--p),var(--p2));border-radius:9px}
+/* POS */
+.pos{display:grid;grid-template-columns:1fr 410px;gap:18px;height:calc(100vh - 140px);min-height:560px}
+.pos .left{display:flex;flex-direction:column;min-height:0}
+.pgrid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px;align-content:start;padding:2px 2px 8px}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:start;transition:.15s;display:flex;flex-direction:column;gap:6px;position:relative}
+.pc:hover{border-color:var(--p);transform:translateY(-2px);box-shadow:var(--sh)}
+.pc .pill{width:38px;height:38px;border-radius:11px;background:color-mix(in srgb,var(--c,var(--p)) 16%,transparent);color:var(--c,var(--p));display:grid;place-items:center}
+.pc b{font-size:14.5px;line-height:1.3}
+.pc .pr{font-weight:800;color:var(--pd);font-size:16px}
+[data-theme=dark] .pc .pr{color:var(--p2)}
+.pc.out{opacity:.5}
+.cart{display:flex;flex-direction:column;min-height:0;padding:16px}
+.cart .lines{flex:1;overflow:auto;margin:8px -6px;padding:0 6px}
+.cl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.qty button{width:30px;height:30px;display:grid;place-items:center;background:var(--card2)}
+.qty button:hover{background:var(--p);color:#fff}
+.qty input{width:44px;text-align:center;border:0;border-radius:0;padding:4px;background:transparent}
+.tot{display:grid;gap:5px;padding-top:10px;border-top:2px solid var(--line)}
+.tot div{display:flex;justify-content:space-between}
+.tot .g{font-size:22px;font-weight:800;color:var(--pd)}
+[data-theme=dark] .tot .g{color:var(--p2)}
+.pays{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.pays button{padding:8px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card2);font-size:13px;font-weight:700}
+.pays button.on{background:var(--p);color:#fff;border-color:var(--p)}
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(5,20,17,.55);backdrop-filter:blur(4px);display:grid;place-items:center;z-index:100;padding:16px;animation:fade .15s}
+.md{background:var(--card);border-radius:22px;width:min(640px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.35);animation:pop .2s}
+.md.w{width:min(980px,100%)}
+.md header{display:flex;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}
+.md header h2{font-size:19px;flex:1}
+.md .bd{padding:22px;overflow:auto}
+.md footer{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+@keyframes fade{from{opacity:0}}@keyframes pop{from{transform:scale(.96) translateY(8px);opacity:0}}
+#toasts{position:fixed;bottom:22px;inset-inline-start:50%;transform:translateX(-50%);display:grid;gap:8px;z-index:200}
+[dir=rtl] #toasts{transform:translateX(50%)}
+.toast{background:var(--fg);color:var(--bg);padding:11px 20px;border-radius:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.3);animation:pop .2s;max-width:90vw}
+.toast.bad{background:var(--bad);color:#fff}.toast.warn{background:var(--warn);color:#2b1c00}
+/* login */
+#login{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:radial-gradient(1200px 600px at 20% 10%,#14c59a55,transparent),radial-gradient(900px 600px at 90% 90%,#6c5ce744,transparent),#06201c;padding:16px}
+.lg{width:min(420px,100%);background:var(--card);border-radius:26px;padding:34px;box-shadow:0 40px 100px rgba(0,0,0,.5)}
+.lg .logo{width:62px;height:62px;border-radius:19px;margin:0 auto 12px}.lg .logo .ic{width:34px;height:34px}
+.lg h1{text-align:center;font-size:30px;font-weight:800}.lg p{text-align:center;color:var(--muted);margin-bottom:22px}
+/* receipt */
+.rc{font-family:'Courier New',monospace;font-size:13px;max-width:320px;margin:auto;color:#000;background:#fff;padding:14px}
+.rc h4{text-align:center;font-size:17px}.rc hr{border:0;border-top:1px dashed #000;margin:8px 0}
+.rc table td,.rc table th{padding:2px 0;border:0;background:none;color:#000;font-size:13px;text-transform:none;letter-spacing:0}
+#printarea{display:none}
+@media print{body>*:not(#printarea){display:none!important}#printarea{display:block!important}}
+.bars{display:flex;align-items:flex-end;gap:10px;height:200px;padding-top:10px}
+.bars .c{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bars .c i{width:100%;max-width:46px;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,var(--p2),var(--p));min-height:3px;transition:.4s}
+.bars .c span{font-size:12px;color:var(--muted)}.bars .c em{font-style:normal;font-size:11.5px;font-weight:700}
+.donut{--s:150px;width:var(--s);height:var(--s);border-radius:50%;display:grid;place-items:center;flex:none}
+.donut::after{content:attr(data-c);width:calc(var(--s) - 44px);height:calc(var(--s) - 44px);border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:800;text-align:center;font-size:13px}
+.dot2{width:10px;height:10px;border-radius:50%;display:inline-block;margin-inline-end:6px}
+@media(max-width:1100px){.pos{grid-template-columns:1fr;height:auto}.pgrid{max-height:420px}}
+@media(max-width:860px){
+  #app{grid-template-columns:1fr}
+  aside{position:fixed;inset-block:0;inset-inline-start:0;width:270px;transform:translateX(100%);transition:.25s}
+  [dir=ltr] aside{transform:translateX(-100%)}
+  aside.open{transform:none!important}
+  .menu-btn{display:grid}
+  #view{padding:16px 14px 40px}header.top{padding:12px 14px}
+}
+</style>
+</head>
+<body>
+<div id="login"></div>
+<div id="app" hidden>
+  <aside id="sb"></aside>
+  <main>
+    <header class="top">
+      <button class="iconbtn menu-btn" onclick="$('#sb').classList.toggle('open')" aria-label="menu"></button>
+      <h1 id="ttl"></h1>
+      <div class="row" id="topact"></div>
+    </header>
+    <div id="view"></div>
+  </main>
+</div>
+<div id="toasts"></div>
+<div id="printarea"></div>
+
+<script>
+/* ====================== Roshetta | روشتة ====================== */
+const $=(s,e=document)=>e.querySelector(s), $$=(s,e=document)=>[...e.querySelectorAll(s)];
+const KEY='roshetta_v1';
+const uid=()=>Math.random().toString(36).slice(2,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ymd=d=>{d=new Date(d);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const addDays=(n,d=new Date())=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const today=()=>ymd(new Date());
+const daysTo=s=>Math.ceil((new Date(s+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5);
+let mem=null;
+const store={get(){try{return localStorage.getItem(KEY)}catch(e){return mem}},set(v){try{localStorage.setItem(KEY,v)}catch(e){mem=v}}};
+
+/* ---------- icons ---------- */
+const IC={
+home:'<path d="M3 11l9-8 9 8"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/>',
+cart:'<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l3 12h11l2-8H6"/>',
+pill:'<path d="M10.5 20.5a5 5 0 0 1-7-7l10-10a5 5 0 0 1 7 7z"/><path d="M8.5 8.5l7 7"/>',
+box:'<path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+truck:'<path d="M1 6h13v10H1zM14 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6M17 4.5a3.5 3.5 0 0 1 0 7M22 20c0-3-2-5-4.5-5.5"/>',
+file:'<path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13h6M9 17h6"/>',
+wallet:'<path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l2-3h12M16 14h2"/>',
+chart:'<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+cog:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>',
+shield:'<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/>',
+bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 0 0 4 0"/>',
+search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',minus:'<path d="M5 12h14"/>',
+trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v6M14 10v6"/>',
+edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>',
+print:'<path d="M6 9V3h12v6M6 18H4v-8h16v8h-2"/><path d="M6 14h12v7H6z"/>',
+x:'<path d="M6 6l12 12M18 6L6 18"/>',
+moon:'<path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/>',
+sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/>',
+globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.500 0 18M12 3c-3 3.500-3 14.500 0 18"/>',
+down:'<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>',up:'<path d="M12 15V3M7 8l5-5 5 5M4 20h16"/>',
+barcode:'<path d="M4 5v14M7 5v14M11 5v14M14 5v10M17 5v14M20 5v14"/>',
+pause:'<path d="M8 5v14M16 5v14"/>',play:'<path d="M7 4l13 8-13 8z"/>',
+undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/>',
+tag:'<path d="M3 12V3h9l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/>',
+logout:'<path d="M10 4H4v16h6M14 8l5 4-5 4M19 12H9"/>',
+menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+check:'<path d="M5 12l5 5 9-10"/>',
+heart:'<path d="M12 21s-8-5-8-11a4.500 4.500 0 0 1 8-2.500A4.500 4.500 0 0 1 20 10c0 6-8 11-8 11z"/>',
+swap:'<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+bag:'<path d="M5 8h14l1 13H4z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'
+};
+const ic=(n,c='')=>`<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||''}</svg>`;
+
+/* ---------- state ---------- */
+let DB=null, ME=null, VIEW='dashboard', cart=[], cartOpts={disc:0,discType:'%',pay:'cash',cust:'',recv:''}, held=[], filt={};
+const CATS=[['Analgesic','مسكنات'],['Antibiotic','مضادات حيوية'],['Cardio','قلب وضغط'],['Diabetes','سكر'],['GI','جهاز هضمي'],['Respiratory','صدر وتنفس'],['Allergy','حساسية'],['Vitamins','فيتامينات'],['Topical','موضعي'],['Cold & Flu','برد وإنفلونزا'],['Cosmetics','مستحضرات تجميل'],['Baby','أطفال'],['Other','أخرى']];
+const CCOL=['#0f9d7a','#6c5ce7','#0ea5e9','#f59e0b','#e5484d','#14b8a6','#ec4899','#84cc16','#f97316','#06b6d4','#a855f7','#22c55e','#64748b'];
+const L=()=>DB?.settings?.lang||'ar';
+const t=(en,ar)=>L()==='ar'?ar:en;
+const catName=c=>{const x=CATS.find(k=>k[0]===c);return x?t(x[0],x[1]):c};
+const catCol=c=>CCOL[Math.max(0,CATS.findIndex(k=>k[0]===c))]||CCOL[0];
+const money=n=>Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' '+(DB.settings.currency||'EGP');
+const num=n=>Number(n||0).toLocaleString('en-US');
+const mname=m=>L()==='ar'?(m.ar||m.en):(m.en||m.ar);
+const dt=s=>new Date(s).toLocaleString(L()==='ar'?'ar-EG-u-nu-latn':'en-GB',{dateStyle:'medium',timeStyle:'short'});
+const dd=s=>new Date(s+(String(s).length<=10?'T00:00:00':'')).toLocaleDateString(L()==='ar'?'ar-EG-u-nu-latn':'en-GB',{day:'2-digit',month:'short',year:'numeric'});
+
+/* ---------- seed ---------- */
+function seed(){
+  const M=[
+   ['Panadol 500mg','باندول ٥٠٠ مجم','Paracetamol','Analgesic',18.5,25,40,0],
+   ['Cetal 500mg','سيتال ٥٠٠ مجم','Paracetamol','Analgesic',14,20,40,0],
+   ['Brufen 400mg','بروفين ٤٠٠ مجم','Ibuprofen','Analgesic',22,32,30,0],
+   ['Cataflam 50mg','كاتافلام ٥٠ مجم','Diclofenac','Analgesic',30,44,25,0],
+   ['Augmentin 1g','أوجمنتين ١ جم','Amoxicillin/Clavulanate','Antibiotic',78,105,20,1],
+   ['Zithrax 500mg','زيثراكس ٥٠٠ مجم','Azithromycin','Antibiotic',62,88,15,1],
+   ['Ciprofar 500mg','سيبروفار ٥٠٠ مجم','Ciprofloxacin','Antibiotic',45,64,15,1],
+   ['Flagyl 500mg','فلاجيل ٥٠٠ مجم','Metronidazole','Antibiotic',16,24,20,1],
+   ['Concor 5mg','كونكور ٥ مجم','Bisoprolol','Cardio',54,76,20,1],
+   ['Norvasc 5mg','نورفاسك ٥ مجم','Amlodipine','Cardio',48,68,20,1],
+   ['Lipitor 20mg','ليبيتور ٢٠ مجم','Atorvastatin','Cardio',120,162,15,1],
+   ['Aspirin Protect 100mg','أسبرين بروتكت ١٠٠','Aspirin','Cardio',24,35,30,0],
+   ['Marevan 5mg','ماريفان ٥ مجم','Warfarin','Cardio',28,40,10,1],
+   ['Lasix 40mg','لازكس ٤٠ مجم','Furosemide','Cardio',12,18,15,1],
+   ['Glucophage 500mg','جلوكوفاج ٥٠٠ مجم','Metformin','Diabetes',26,38,25,1],
+   ['Amaryl 2mg','أماريل ٢ مجم','Glimepiride','Diabetes',70,96,15,1],
+   ['Mixtard 30 Pen','ميكستارد ٣٠ قلم','Insulin','Diabetes',210,265,8,1],
+   ['Nexium 40mg','نكسيم ٤٠ مجم','Esomeprazole','GI',130,175,20,0],
+   ['Omez 20mg','أوميز ٢٠ مجم','Omeprazole','GI',34,48,25,0],
+   ['Antinal 200mg','أنتينال ٢٠٠ مجم','Nifuroxazide','GI',27,38,20,0],
+   ['Digestin Syrup','هضمين شراب','Digestive Enzymes','GI',19,28,15,0],
+   ['Ventolin Inhaler','فنتولين بخاخ','Salbutamol','Respiratory',58,80,15,1],
+   ['Mucosolvan Syrup','موكوسولفان شراب','Ambroxol','Respiratory',36,52,15,0],
+   ['Zyrtec 10mg','زيرتك ١٠ مجم','Cetirizine','Allergy',32,46,20,0],
+   ['Claritine 10mg','كلارتين ١٠ مجم','Loratadine','Allergy',29,42,20,0],
+   ['Vitamin C 1000 Eff.','فيتامين سي ١٠٠٠ فوار','Ascorbic Acid','Vitamins',40,58,30,0],
+   ['Vitamin D3 50000','فيتامين د٣ ٥٠٠٠٠','Cholecalciferol','Vitamins',65,90,15,0],
+   ['Neurobion','نيوروبيون','Vitamin B Complex','Vitamins',52,74,20,0],
+   ['Panthenol Cream','بانثينول كريم','Dexpanthenol','Topical',34,49,15,0],
+   ['Betadine Solution','بيتادين محلول','Povidone Iodine','Topical',28,40,15,0],
+   ['Voltaren Emulgel','فولتارين إميجل','Diclofenac','Topical',68,94,12,0],
+   ['Strepsils Lozenges','ستربسيلز أقراص','Amylmetacresol','Cold & Flu',22,32,30,0],
+   ['Congestal','كونجستال','Paracetamol/Pseudoephedrine','Cold & Flu',16,24,40,0],
+   ['Otrivin Nasal Spray','أوترفين بخاخ أنف','Xylometazoline','Cold & Flu',30,44,20,0],
+   ['Cerave Moisturizer','سيرافي مرطب','Moisturizer','Cosmetics',320,410,6,0],
+   ['Baby Wipes','مناديل أطفال','—','Baby',25,36,25,0],
+   ['Infacol Drops','إنفاكول نقط','Simethicone','Baby',44,62,12,0]
+  ];
+  const meds=M.map((m,i)=>{
+    const b=[];const nb=1+(i%3==0?1:0);
+    for(let k=0;k<nb;k++){
+      let off=[400,180,75,28,610,-12,240,900][(i*3+k*5)%8];
+      b.push({batch:'B'+(2500+i*7+k),exp:ymd(addDays(off)),qty:[60,45,12,5,90,30,22,70][(i+k*3)%8]});
+    }
+    if(i==12)b[0].qty=4; if(i==16)b[0].qty=3;
+    return {id:'m'+i,en:m[0],ar:m[1],generic:m[2],cat:m[3],barcode:'62'+String(1000000000+i*7919).slice(0,10),unit:'Pack',cost:m[4],price:m[5],min:Math.round(m[6]/3),loc:'A'+(1+i%6)+'-'+(1+i%4),rx:!!m[7],batches:b};
+  });
+  const customers=[
+    {id:'c1',name:'أحمد محمود',phone:'01001234567',debt:0,points:120},
+    {id:'c2',name:'Mona Ibrahim',phone:'01112223344',debt:350,points:40},
+    {id:'c3',name:'محمد السيد',phone:'01228889900',debt:0,points:260}];
+  const suppliers=[
+    {id:'s1',name:'الشركة المتحدة للأدوية',phone:'0233334444',balance:4200},
+    {id:'s2',name:'Nile Pharma Distribution',phone:'0227778888',balance:0},
+    {id:'s3',name:'مخازن الأمل',phone:'0235556666',balance:1500}];
+  const users=[
+    {id:'u1',name:'Admin',role:'admin',pin:'1234'},
+    {id:'u2',name:'د. سارة',role:'pharmacist',pin:'2222'},
+    {id:'u3',name:'Kareem',role:'cashier',pin:'3333'}];
+  // demo sales
+  const sales=[];let n=1000;
+  for(let d=13;d>=0;d--){
+    const cnt=4+((d*7)%6);
+    for(let k=0;k<cnt;k++){
+      const items=[];const c=1+((d+k)%3);
+      for(let j=0;j<c;j++){const m=meds[(d*5+k*3+j*7)%meds.length];const q=1+((d+j)%3);items.push({medId:m.id,name:m.en,ar:m.ar,qty:q,price:m.price,cost:m.cost});}
+      const sub=items.reduce((a,i)=>a+i.qty*i.price,0);
+      const date=addDays(-d);date.setHours(9+k*1.3|0,(k*17)%60);
+      sales.push({id:uid(),no:'INV-'+(n++),date:date.toISOString(),items,sub,disc:0,tax:0,total:sub,pay:['cash','cash','card','wallet'][(d+k)%4],cust:'',user:['u1','u2','u3'][(d+k)%3],ret:{amount:0,cost:0}});
+    }
+  }
+  const purchases=[{id:uid(),no:'PO-500',date:addDays(-9).toISOString(),supplier:'s1',items:[{medId:'m0',en:'Panadol 500mg',qty:100,cost:18.5,batch:'B2500',exp:ymd(addDays(500))}],total:1850,paid:0}];
+  const expenses=[
+    {id:uid(),date:ymd(addDays(-5)),cat:'Rent',amount:6000,note:'إيجار الشهر'},
+    {id:uid(),date:ymd(addDays(-3)),cat:'Electricity',amount:850,note:''},
+    {id:uid(),date:ymd(addDays(-1)),cat:'Salaries',amount:4500,note:'مرتب مساعد'}];
+  const rx=[
+    {id:uid(),no:'RX-100',date:today(),patient:'خالد عبدالله',phone:'01005556677',doctor:'د. هاني فتحي',notes:'Chronic — monthly',items:[{medId:'m14',qty:2,dose:'1×2 بعد الأكل'},{medId:'m9',qty:1,dose:'1×1'}],status:'pending',refill:ymd(addDays(3))}];
+  return {meds,customers,suppliers,users,sales,purchases,expenses,rx,
+    settings:{name:'صيدلية روشتة',nameEn:'Roshetta Pharmacy',phone:'01000000000',address:'القاهرة، مصر',tax:0,currency:'EGP',lang:'ar',theme:'light',expDays:90,license:'PH-2026-0001',footer:'شكراً لزيارتكم — Thank you!'},
+    seq:{sale:n,po:501,rx:101}};
+}
+function load(){
+  try{const r=store.get();if(r){DB=JSON.parse(r);return}}catch(e){}
+  DB=seed();persist();
+}
+function persist(){store.set(JSON.stringify(DB))}
+
+/* ---------- stock helpers ---------- */
+const stockAll=m=>m.batches.reduce((a,b)=>a+b.qty,0);
+const stockOk=m=>m.batches.filter(b=>daysTo(b.exp)>=0).reduce((a,b)=>a+b.qty,0);
+const stockExpired=m=>m.batches.filter(b=>daysTo(b.exp)<0).reduce((a,b)=>a+b.qty,0);
+const nearExp=m=>m.batches.filter(b=>b.qty>0&&daysTo(b.exp)>=0&&daysTo(b.exp)<=DB.settings.expDays);
+const expiredB=m=>m.batches.filter(b=>b.qty>0&&daysTo(b.exp)<0);
+const isLow=m=>stockOk(m)<=m.min;
+const medById=id=>DB.meds.find(m=>m.id===id);
+const custById=id=>DB.customers.find(c=>c.id===id);
+const supById=id=>DB.suppliers.find(c=>c.id===id);
+const userById=id=>DB.users.find(c=>c.id===id);
+const saleNet=s=>s.total-(s.ret?.amount||0);
+const saleCost=s=>s.items.reduce((a,i)=>a+i.qty*i.cost,0)-(s.ret?.cost||0);
+function alerts(){
+  const low=DB.meds.filter(isLow),near=DB.meds.filter(m=>nearExp(m).length),exp=DB.meds.filter(m=>expiredB(m).length);
+  const refills=DB.rx.filter(r=>r.status!=='done'&&r.refill&&daysTo(r.refill)<=3);
+  return {low,near,exp,refills,count:low.length+near.length+exp.length+refills.length};
+}
+const INTER=[['warfarin','aspirin'],['warfarin','ibuprofen'],['warfarin','diclofenac'],['aspirin','ibuprofen'],['metformin','ciprofloxacin'],['azithromycin','warfarin'],['ciprofloxacin','glimepiride'],['atorvastatin','azithromycin'],['bisoprolol','insulin']];
+function interactions(ids){
+  const g=ids.map(i=>(medById(i)?.generic||'').toLowerCase());const out=[];
+  INTER.forEach(([a,b])=>{if(g.some(x=>x.includes(a))&&g.some(x=>x.includes(b)))out.push(a+' + '+b)});
+  return out;
+}
+
+/* ---------- ui helpers ---------- */
+function toast(msg,type=''){const e=document.createElement('div');e.className='toast '+type;e.textContent=msg;$('#toasts').appendChild(e);setTimeout(()=>e.remove(),type?4200:2600)}
+function modal(title,body,o={}){
+  const ov=document.createElement('div');ov.className='ov';
+  ov.innerHTML=`<div class="md ${o.wide?'w':''}" role="dialog" aria-modal="true"><header><h2>${title}</h2><button class="iconbtn" data-x aria-label="close">${ic('x')}</button></header><div class="bd">${body}</div>${o.noFoot?'':`<footer><button class="btn" data-x>${t('Cancel','إلغاء')}</button>${o.extra||''}<button class="btn p" data-ok>${o.ok||t('Save','حفظ')}</button></footer>`}</div>`;
+  const close=()=>ov.remove();
+  ov.addEventListener('click',e=>{if(e.target===ov||e.target.closest('[data-x]'))close()});
+  ov.querySelector('[data-ok]')?.addEventListener('click',()=>{if(o.onOk&&o.onOk(ov)===false)return;close()});
+  document.body.appendChild(ov);
+  setTimeout(()=>ov.querySelector('input:not([type=hidden]),select')?.focus(),30);
+  ov.close=close;return ov;
+}
+const fv=(ov,n)=>ov.querySelector(`[name=${n}]`)?.value;
+const field=(label,name,val='',type='text',extra='')=>`<div><label class="f">${label}</label><input name="${name}" type="${type}" value="${esc(val)}" ${extra}></div>`;
+const sel=(label,name,opts,val='')=>`<div><label class="f">${label}</label><select name="${name}">${opts.map(o=>`<option value="${esc(o[0])}" ${o[0]==val?'selected':''}>${esc(o[1])}</option>`).join('')}</select></div>`;
+const confirmD=(msg,fn)=>modal(t('Confirm','تأكيد'),`<p>${msg}</p>`,{ok:t('Yes','نعم'),onOk:()=>fn()});
+function csv(name,rows){const b=new Blob(['﻿'+rows.map(r=>r.map(c=>'"'+String(c??'').replace(/"/g,'""')+'"').join(',')).join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name+'.csv';a.click()}
+const tableWrap=(h,rows,empty)=>rows.length?`<div class="tw"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`:`<div class="card empty">${ic('box')}<p>${empty||t('No data','لا توجد بيانات')}</p></div>`;
+function kpi(icn,label,val,col,sub=''){return `<div class="card kpi" style="--kc:${col}"><div class="k-ic" style="background:linear-gradient(135deg,${col},${col}cc)">${ic(icn)}</div><div><small>${label}</small><b>${val}</b>${sub?`<small>${sub}</small>`:''}</div></div>`}
+function barChart(vals,labels){const mx=Math.max(...vals,1);return `<div class="bars">${vals.map((v,i)=>`<div class="c"><em>${v?num(Math.round(v)):''}</em><i style="height:${Math.max(2,v/mx*78)}%"></i><span>${labels[i]}</span></div>`).join('')}</div>`}
+function donut(parts){const tot=parts.reduce((a,p)=>a+p.v,0)||1;let acc=0;const segs=parts.map(p=>{const s=acc/tot*100;acc+=p.v;return `${p.c} ${s}% ${acc/tot*100}%`}).join(',');
+  return `<div class="row" style="gap:22px;flex-wrap:wrap"><div class="donut" style="background:conic-gradient(${segs||'var(--bg2) 0 100%'})" data-c="${money(tot).replace(/\.00/,'')}"></div><div style="flex:1;min-width:140px">${parts.map(p=>`<div class="list-i" style="padding:5px 0"><span><i class="dot2" style="background:${p.c}"></i>${p.l}</span><span class="sp"></span><b>${Math.round(p.v/tot*100)}%</b></div>`).join('')}</div></div>`}
+
+/* ---------- auth ---------- */
+function showLogin(){
+  const lg=$('#login');lg.hidden=false;$('#app').hidden=true;
+  lg.innerHTML=`<div class="lg"><div class="logo">${ic('pill')}</div><h1>Roshetta · روشتة</h1><p>${t('Smart pharmacy management','نظام إدارة الصيدليات الذكي')}</p>
+  <div style="display:grid;gap:12px">${sel(t('User','المستخدم'),'u',DB.users.map(u=>[u.id,u.name+' — '+roleName(u.role)]))}
+  ${field(t('PIN','الرقم السري'),'pin','','password','inputmode="numeric" placeholder="••••" autocomplete="off"')}
+  <button class="btn p" id="lgb" style="padding:13px">${ic('shield')} ${t('Sign in','دخول')}</button>
+  <div class="row"><button class="btn sm sp" id="lgl">${ic('globe')} ${t('العربية','English')}</button><span class="muted" style="font-size:12.5px">${t('Demo PIN: 1234','تجريبي: 1234')}</span></div></div></div>`;
+  const go=()=>{const u=DB.users.find(x=>x.id===$('[name=u]',lg).value);if(u&&u.pin===$('[name=pin]',lg).value){ME=u;sessionStorage.setItem('rs_u',u.id);boot()}else{toast(t('Wrong PIN','الرقم السري غير صحيح'),'bad')}};
+  $('#lgb').onclick=go;$('[name=pin]',lg).onkeydown=e=>{if(e.key==='Enter')go()};
+  $('#lgl').onclick=()=>{DB.settings.lang=L()==='ar'?'en':'ar';persist();applyLang();showLogin()};
+}
+const roleName=r=>({admin:t('Admin','مدير'),pharmacist:t('Pharmacist','صيدلي'),cashier:t('Cashier','كاشير')})[r]||r;
+function applyLang(){document.documentElement.lang=L();document.documentElement.dir=L()==='ar'?'rtl':'ltr';document.documentElement.dataset.theme=DB.settings.theme}
+function logout(){sessionStorage.removeItem('rs_u');ME=null;showLogin()}
+
+/* ---------- nav / router ---------- */
+const NAV=[
+ ['dashboard','home',['Dashboard','لوحة التحكم'],['admin','pharmacist','cashier']],
+ ['pos','cart',['Point of Sale','نقطة البيع'],['admin','pharmacist','cashier']],
+ ['inventory','pill',['Inventory','المخزون'],['admin','pharmacist']],
+ ['expiry','clock',['Expiry & Alerts','الصلاحية والتنبيهات'],['admin','pharmacist']],
+ ['sales','file',['Sales & Returns','المبيعات والمرتجعات'],['admin','pharmacist','cashier']],
+ ['rx','heart',['Prescriptions','الروشتات'],['admin','pharmacist','cashier']],
+ ['purchases','truck',['Purchases','المشتريات'],['admin','pharmacist']],
+ ['suppliers','bag',['Suppliers','الموردون'],['admin','pharmacist']],
+ ['customers','users',['Customers','العملاء'],['admin','pharmacist','cashier']],
+ ['expenses','wallet',['Expenses','المصروفات'],['admin']],
+ ['reports','chart',['Reports','التقارير'],['admin']],
+ ['users','shield',['Users','المستخدمون'],['admin']],
+ ['settings','cog',['Settings','الإعدادات'],['admin']]
+];
+function renderShell(){
+  const al=alerts();
+  $('#sb').innerHTML=`<div class="brand"><div class="logo">${ic('pill')}</div><div><b>Roshetta</b><small>${t('روشتة — Pharmacy OS','Pharmacy Management')}</small></div></div>
+  <nav>${NAV.filter(n=>n[3].includes(ME.role)).map(n=>`<a class="${VIEW===n[0]?'on':''}" onclick="go('${n[0]}')" tabindex="0">${ic(n[1])}<span>${t(n[2][0],n[2][1])}</span>${n[0]==='expiry'&&al.count?`<span class="badge bad">${al.count}</span>`:''}</a>`).join('')}</nav>
+  <div class="sbfoot"><div class="avatar">${esc(ME.name[0])}</div><div style="flex:1;min-width:0"><b style="color:#fff;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(ME.name)}</b><small>${roleName(ME.role)}</small></div><button class="iconbtn" style="background:transparent;border-color:rgba(255,255,255,.2);color:#fff" onclick="logout()" title="${t('Logout','خروج')}">${ic('logout')}</button></div>`;
+  $('.menu-btn').innerHTML=ic('menu');
+  const nv=NAV.find(n=>n[0]===VIEW);$('#ttl').textContent=nv?t(nv[2][0],nv[2][1]):'';
+  $('#topact').innerHTML=`<button class="iconbtn" onclick="toggleLang()" title="Language">${ic('globe')}</button><button class="iconbtn" onclick="toggleTheme()" title="Theme">${ic(DB.settings.theme==='dark'?'sun':'moon')}</button><button class="iconbtn" onclick="go('expiry')" title="${t('Alerts','تنبيهات')}">${ic('bell')}${al.count?`<span class="dot">${al.count}</span>`:''}</button>`;
+}
+function go(v){VIEW=v;location.hash=v;$('#sb').classList.remove('open');render()}
+function render(){
+  if(!NAV.find(n=>n[0]===VIEW&&n[3].includes(ME.role)))VIEW='dashboard';
+  renderShell();$('#view').innerHTML='';
+  (V[VIEW]||V.dashboard)($('#view'));
+  $('#view').scrollTop=0;
+}
+function toggleLang(){DB.settings.lang=L()==='ar'?'en':'ar';persist();applyLang();render()}
+function toggleTheme(){DB.settings.theme=DB.settings.theme==='dark'?'light':'dark';persist();applyLang();render()}
+
+/* ====================== VIEWS ====================== */
+const V={};
+
+/* ---- Dashboard ---- */
+V.dashboard=el=>{
+  const td=today();const ts=DB.sales.filter(s=>ymd(s.date)===td);
+  const rev=ts.reduce((a,s)=>a+saleNet(s),0),prof=ts.reduce((a,s)=>a+saleNet(s)-saleCost(s),0);
+  const stockVal=DB.meds.reduce((a,m)=>a+stockOk(m)*m.cost,0);const al=alerts();
+  const days=[...Array(7)].map((_,i)=>ymd(addDays(i-6)));
+  const vals=days.map(d=>DB.sales.filter(s=>ymd(s.date)===d).reduce((a,s)=>a+saleNet(s),0));
+  const lbl=days.map(d=>new Date(d+'T00:00:00').toLocaleDateString(L()==='ar'?'ar-EG':'en-US',{weekday:'short'}));
+  const cnt={};DB.sales.filter(s=>daysTo(ymd(s.date))>=-30).forEach(s=>s.items.forEach(i=>cnt[i.medId]=(cnt[i.medId]||0)+i.qty));
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,5);const tmax=top[0]?.[1]||1;
+  const hour=new Date().getHours();const greet=hour<12?t('Good morning','صباح الخير'):hour<18?t('Good afternoon','نهارك سعيد'):t('Good evening','مساء الخير');
+  el.innerHTML=`
+  <div class="card" style="background:linear-gradient(120deg,var(--pd),var(--p) 55%,var(--p2));color:#fff;border:0;margin-bottom:18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div style="flex:1;min-width:240px"><h2 style="font-size:26px">${greet}، ${esc(ME.name)} 👋</h2><p style="opacity:.9">${t('Here is what is happening in','هذا ملخص ما يحدث في')} ${esc(L()==='ar'?DB.settings.name:DB.settings.nameEn)} ${t('today','اليوم')}.</p></div>
+    <button class="btn" onclick="go('pos')" style="color:var(--pd)">${ic('cart')} ${t('New sale','بيع جديد')}</button>
+    ${['admin','pharmacist'].includes(ME.role)?`<button class="btn" onclick="go('purchases')" style="color:var(--pd)">${ic('truck')} ${t('New purchase','شراء جديد')}</button>`:''}
+  </div>
+  <div class="grid g4" style="margin-bottom:18px">
+    ${kpi('wallet',t("Today's sales",'مبيعات اليوم'),money(rev),'#0f9d7a',ts.length+' '+t('invoices','فاتورة'))}
+    ${kpi('chart',t("Today's profit",'ربح اليوم'),money(prof),'#6c5ce7')}
+    ${kpi('box',t('Stock value (cost)','قيمة المخزون (تكلفة)'),money(stockVal),'#0ea5e9',DB.meds.length+' '+t('items','صنف'))}
+    ${kpi('alert',t('Needs attention','يحتاج انتباه'),al.low.length+al.near.length+al.exp.length,'#e5484d',`${al.low.length} ${t('low','ناقص')} · ${al.near.length} ${t('near-exp','قريب الانتهاء')} · ${al.exp.length} ${t('expired','منتهي')}`)}
+  </div>
+  <div class="grid g2" style="margin-bottom:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))">
+    <div class="card"><h3>${ic('chart')} ${t('Last 7 days sales','مبيعات آخر ٧ أيام')}</h3>${barChart(vals,lbl)}</div>
+    <div class="card"><h3>${ic('tag')} ${t('Top sellers (30 days)','الأكثر مبيعاً (٣٠ يوم)')}</h3>
+      ${top.length?top.map(([id,q])=>{const m=medById(id);return m?`<div class="list-i"><div style="flex:1;min-width:0"><b>${esc(mname(m))}</b><div class="row" style="margin-top:4px"><div class="pbar"><i style="width:${q/tmax*100}%"></i></div><span class="muted nowrap">${q}</span></div></div></div>`:''}).join(''):`<div class="empty">${t('No sales yet','لا مبيعات بعد')}</div>`}
+    </div>
+  </div>
+  <div class="grid g3">
+    <div class="card"><h3>${ic('clock')} ${t('Expiring soon','قريبة الانتهاء')}</h3>
+      ${[...al.exp.slice(0,2).map(m=>[m,expiredB(m)[0],true]),...al.near.slice(0,4).map(m=>[m,nearExp(m)[0],false])].map(([m,b,x])=>`<div class="list-i"><div style="flex:1"><b>${esc(mname(m))}</b><div class="muted" style="font-size:12.5px">${b.batch} · ${b.qty} ${t('pcs','عبوة')}</div></div><span class="badge ${x?'bad':'warn'}">${x?t('Expired','منتهي'):dd(b.exp)}</span></div>`).join('')||`<div class="empty">${t('All good ✓','كل شيء سليم ✓')}</div>`}
+    </div>
+    <div class="card"><h3>${ic('alert')} ${t('Low stock','نواقص المخزون')}</h3>
+      ${al.low.slice(0,6).map(m=>`<div class="list-i"><div style="flex:1"><b>${esc(mname(m))}</b><div class="muted" style="font-size:12.5px">${t('Min','الحد الأدنى')} ${m.min}</div></div><span class="badge bad">${stockOk(m)}</span></div>`).join('')||`<div class="empty">${t('No shortages','لا نواقص')}</div>`}
+    </div>
+    <div class="card"><h3>${ic('file')} ${t('Recent invoices','آخر الفواتير')}</h3>
+      ${DB.sales.slice(-6).reverse().map(s=>`<div class="list-i"><div style="flex:1"><b>${s.no}</b><div class="muted" style="font-size:12.5px">${dt(s.date)}</div></div><b>${money(saleNet(s))}</b></div>`).join('')||`<div class="empty">${t('No invoices','لا فواتير')}</div>`}
+    </div>
+  </div>`;
+};
+
+/* ---- POS ---- */
+V.pos=el=>{
+  filt.pcat=filt.pcat||'';filt.pq=filt.pq||'';
+  el.innerHTML=`<div class="pos">
+   <div class="left">
+     <div class="bar"><div class="sw grow">${ic('search')}<input id="pq" placeholder="${t('Search name / generic / scan barcode (F2)…','ابحث بالاسم / المادة الفعالة / امسح الباركود (F2)…')}" autocomplete="off" value="${esc(filt.pq)}"></div></div>
+     <div class="chips" style="margin-bottom:12px" id="pchips"></div>
+     <div class="pgrid" id="pgrid"></div>
+   </div>
+   <div class="card cart" id="cartbox"></div></div>`;
+  $('#pchips').innerHTML=[['',t('All','الكل')],...CATS.map(c=>[c[0],t(c[0],c[1])])].map(c=>`<button class="chip ${filt.pcat===c[0]?'on':''}" data-c="${esc(c[0])}">${c[1]}</button>`).join('');
+  $$('#pchips .chip').forEach(b=>b.onclick=()=>{filt.pcat=b.dataset.c;V.pos(el)});
+  const drawGrid=()=>{
+    const q=filt.pq.toLowerCase().trim();
+    const list=DB.meds.filter(m=>(!filt.pcat||m.cat===filt.pcat)&&(!q||[m.en,m.ar,m.generic,m.barcode].some(x=>(x||'').toLowerCase().includes(q)))).slice(0,120);
+    $('#pgrid').innerHTML=list.map(m=>{const s=stockOk(m);return `<button class="pc ${s<=0?'out':''}" style="--c:${catCol(m.cat)}" data-id="${m.id}"><div class="row"><div class="pill">${ic('pill')}</div><span class="sp"></span>${m.rx?`<span class="badge acc">Rx</span>`:''}</div><b>${esc(mname(m))}</b><small class="muted">${esc(m.generic)}</small><div class="row"><span class="pr">${money(m.price)}</span><span class="sp"></span><span class="badge ${s<=0?'bad':s<=m.min?'warn':'ok'}">${s}</span></div></button>`}).join('')||`<div class="empty" style="grid-column:1/-1">${t('No matching items','لا توجد أصناف مطابقة')}</div>`;
+    $$('#pgrid .pc').forEach(b=>b.onclick=()=>addCart(b.dataset.id));
+  };
+  const pq=$('#pq');
+  pq.oninput=()=>{filt.pq=pq.value;drawGrid()};
+  pq.onkeydown=e=>{if(e.key==='Enter'){const q=pq.value.trim();if(!q)return;const ex=DB.meds.find(m=>m.barcode===q);if(ex){addCart(ex.id);pq.value='';filt.pq='';drawGrid();return}
+    const f=DB.meds.filter(m=>[m.en,m.ar,m.generic].some(x=>(x||'').toLowerCase().includes(q.toLowerCase())));if(f.length===1){addCart(f[0].id);pq.value='';filt.pq='';drawGrid()}else if(!f.length)toast(t('Not found','غير موجود'),'bad')}};
+  drawGrid();drawCart();
+};
+function addCart(id,qty=1){
+  const m=medById(id);if(!m)return;const l=cart.find(c=>c.id===id);const have=l?l.qty:0;
+  if(have+qty>stockOk(m)){toast(t('Insufficient stock','الكمية المتاحة غير كافية')+` (${stockOk(m)})`,'bad');return}
+  if(l)l.qty+=qty;else cart.push({id,qty,price:m.price});
+  if(m.rx&&!l)toast(t('Prescription-only medicine (Rx)','دواء بروشتة طبية (Rx)'),'warn');
+  const w=interactions(cart.map(c=>c.id));if(w.length&&!l)toast(t('⚠ Possible interaction: ','⚠ تداخل دوائي محتمل: ')+w.join(' | '),'warn');
+  if(VIEW==='pos')drawCart();
+}
+function cartTotals(){
+  const sub=cart.reduce((a,c)=>a+c.qty*c.price,0);
+  let d=cartOpts.discType==='%'?sub*(+cartOpts.disc||0)/100:(+cartOpts.disc||0);d=Math.min(Math.max(d,0),sub);
+  const tax=(sub-d)*(+DB.settings.tax||0)/100;return {sub,disc:d,tax,total:sub-d+tax};
+}
+function drawCart(){
+  const box=$('#cartbox');if(!box)return;const T=cartTotals();
+  box.innerHTML=`<div class="row"><h3 style="margin:0" class="sp">${ic('cart')} ${t('Current invoice','الفاتورة الحالية')}</h3>
+    <button class="btn sm" onclick="holdCart()" title="${t('Hold','تعليق')}">${ic('pause')}</button>
+    <button class="btn sm" onclick="resumeCart()" title="${t('Held invoices','الفواتير المعلقة')}">${ic('play')}${held.length?` ${held.length}`:''}</button>
+    <button class="btn sm" onclick="cart=[];drawCart()" title="${t('Clear','مسح')}">${ic('trash')}</button></div>
+  <div class="lines">${cart.length?cart.map((c,i)=>{const m=medById(c.id);return `<div class="cl"><div><b>${esc(mname(m))}</b><div class="muted" style="font-size:12.5px">${money(c.price)}</div></div><b class="right">${money(c.qty*c.price)}</b>
+    <div class="qty"><button onclick="cq(${i},-1)">${ic('minus')}</button><input type="number" min="1" value="${c.qty}" onchange="cqs(${i},this.value)"><button onclick="cq(${i},1)">${ic('plus')}</button></div>
+    <button class="btn sm right" style="justify-self:end" onclick="cart.splice(${i},1);drawCart()">${ic('x')}</button></div>`}).join(''):`<div class="empty">${ic('cart')}<p>${t('Cart is empty — tap a medicine to add','السلة فارغة — اضغط على دواء لإضافته')}</p></div>`}</div>
+  <div class="fg" style="grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+    <div><label class="f">${t('Customer','العميل')}</label><select id="cc" onchange="cartOpts.cust=this.value"><option value="">${t('Walk-in','عميل نقدي')}</option>${DB.customers.map(c=>`<option value="${c.id}" ${cartOpts.cust===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></div>
+    <div><label class="f">${t('Discount','خصم')}</label><div class="row" style="gap:4px"><input type="number" min="0" value="${cartOpts.disc||''}" oninput="cartOpts.disc=this.value;drawTot()" style="min-width:0"><select style="width:62px;padding:10px 4px" onchange="cartOpts.discType=this.value;drawTot()"><option ${cartOpts.discType==='%'?'selected':''}>%</option><option ${cartOpts.discType!=='%'?'selected':''} value="$">${DB.settings.currency}</option></select></div></div></div>
+  <div class="pays">${[['cash',t('Cash','نقدي')],['card',t('Card','بطاقة')],['wallet',t('Wallet','محفظة')],['credit',t('Credit','آجل')]].map(p=>`<button class="${cartOpts.pay===p[0]?'on':''}" onclick="cartOpts.pay='${p[0]}';drawCart()">${p[1]}</button>`).join('')}</div>
+  <div class="tot" id="tot"></div>
+  <button class="btn p" style="margin-top:12px;padding:14px;font-size:17px" onclick="checkout()" ${cart.length?'':'disabled'}>${ic('check')} ${t('Pay & print (F9)','دفع وطباعة (F9)')}</button>`;
+  drawTot();
+}
+function drawTot(){
+  const T=cartTotals();const tt=$('#tot');if(!tt)return;
+  tt.innerHTML=`<div><span class="muted">${t('Subtotal','المجموع')}</span><span>${money(T.sub)}</span></div>${T.disc?`<div><span class="muted">${t('Discount','الخصم')}</span><span>- ${money(T.disc)}</span></div>`:''}${T.tax?`<div><span class="muted">${t('Tax','ضريبة')} ${DB.settings.tax}%</span><span>${money(T.tax)}</span></div>`:''}<div class="g"><span>${t('Total','الإجمالي')}</span><span>${money(T.total)}</span></div>
+  ${cartOpts.pay==='cash'?`<div class="row" style="margin-top:4px"><input type="number" placeholder="${t('Cash received','المبلغ المستلم')}" value="${cartOpts.recv}" oninput="cartOpts.recv=this.value;const r=+this.value-cartTotals().total;$('#chg').textContent=r>=0?money(r):'—'"><b class="nowrap">${t('Change','الباقي')}: <span id="chg">${cartOpts.recv&&+cartOpts.recv>=T.total?money(+cartOpts.recv-T.total):'—'}</span></b></div>`:''}`;
+}
+function cq(i,d){const c=cart[i];cqs(i,c.qty+d)}
+function cqs(i,v){v=Math.floor(+v);const c=cart[i];if(v<1){cart.splice(i,1);drawCart();return}const m=medById(c.id);if(v>stockOk(m)){toast(t('Insufficient stock','الكمية غير كافية')+` (${stockOk(m)})`,'bad');v=stockOk(m)}c.qty=v;drawCart()}
+function holdCart(){if(!cart.length)return;held.push({cart,cartOpts:{...cartOpts},t:Date.now()});cart=[];cartOpts={disc:0,discType:'%',pay:'cash',cust:'',recv:''};toast(t('Invoice held','تم تعليق الفاتورة'));drawCart()}
+function resumeCart(){
+  if(!held.length){toast(t('No held invoices','لا توجد فواتير معلقة'));return}
+  const ov=modal(t('Held invoices','الفواتير المعلقة'),held.map((h,i)=>`<div class="list-i"><div class="sp"><b>#${i+1}</b> — ${h.cart.length} ${t('items','أصناف')}<div class="muted">${new Date(h.t).toLocaleTimeString()}</div></div><button class="btn sm p" data-r="${i}">${t('Resume','استئناف')}</button></div>`).join(''),{noFoot:true});
+  $$('[data-r]',ov).forEach(b=>b.onclick=()=>{const h=held.splice(+b.dataset.r,1)[0];if(cart.length)held.push({cart,cartOpts:{...cartOpts},t:Date.now()});cart=h.cart;cartOpts=h.cartOpts;ov.close();drawCart()});
+}
+function checkout(){
+  if(!cart.length)return;const T=cartTotals();
+  if(cartOpts.pay==='credit'&&!cartOpts.cust){toast(t('Choose a customer for credit sales','اختر عميلاً للبيع الآجل'),'bad');return}
+  for(const c of cart){const m=medById(c.id);if(c.qty>stockOk(m)){toast(t('Insufficient stock: ','مخزون غير كافٍ: ')+mname(m),'bad');return}}
+  const items=[];
+  cart.forEach(c=>{const m=medById(c.id);let need=c.qty;
+    m.batches.filter(b=>b.qty>0&&daysTo(b.exp)>=0).sort((a,b)=>a.exp.localeCompare(b.exp)).forEach(b=>{if(need<=0)return;const u=Math.min(b.qty,need);b.qty-=u;need-=u;items.push({medId:m.id,name:m.en,ar:m.ar,qty:u,price:c.price,cost:m.cost,batch:b.batch})});});
+  const sale={id:uid(),no:'INV-'+(DB.seq.sale++),date:new Date().toISOString(),items,sub:T.sub,disc:T.disc,tax:T.tax,total:T.total,pay:cartOpts.pay,cust:cartOpts.cust,user:ME.id,ret:{amount:0,cost:0}};
+  DB.sales.push(sale);
+  if(sale.cust){const c=custById(sale.cust);c.points=(c.points||0)+Math.floor(T.total/10);if(sale.pay==='credit')c.debt=(c.debt||0)+T.total}
+  persist();cart=[];cartOpts={disc:0,discType:'%',pay:'cash',cust:'',recv:''};
+  showReceipt(sale);render();
+}
+function receiptHTML(s){
+  const c=s.cust?custById(s.cust):null;
+  return `<div class="rc"><h4>${esc(DB.settings.name)}</h4><div style="text-align:center">${esc(DB.settings.address)}<br>${esc(DB.settings.phone)}</div><hr>
+  <div>${s.no} · ${dt(s.date)}</div><div>${t('Cashier','الكاشير')}: ${esc(userById(s.user)?.name||'')}</div>${c?`<div>${t('Customer','العميل')}: ${esc(c.name)}</div>`:''}<hr>
+  <table style="width:100%">${(()=>{const g={};s.items.forEach(i=>{const k=i.medId+i.price;g[k]=g[k]||{...i,qty:0};g[k].qty+=i.qty});return Object.values(g).map(i=>`<tr><td>${esc(L()==='ar'?i.ar:i.name)}<br><small>${i.qty} × ${i.price.toFixed(2)}</small></td><td style="text-align:end;vertical-align:bottom">${(i.qty*i.price).toFixed(2)}</td></tr>`).join('')})()}</table><hr>
+  <table style="width:100%"><tr><td>${t('Subtotal','المجموع')}</td><td style="text-align:end">${s.sub.toFixed(2)}</td></tr>${s.disc?`<tr><td>${t('Discount','الخصم')}</td><td style="text-align:end">-${s.disc.toFixed(2)}</td></tr>`:''}${s.tax?`<tr><td>${t('Tax','ضريبة')}</td><td style="text-align:end">${s.tax.toFixed(2)}</td></tr>`:''}<tr><td><b>${t('TOTAL','الإجمالي')}</b></td><td style="text-align:end"><b>${s.total.toFixed(2)} ${DB.settings.currency}</b></td></tr></table><hr>
+  <div style="text-align:center">${t('Payment','الدفع')}: ${({cash:t('Cash','نقدي'),card:t('Card','بطاقة'),wallet:t('Wallet','محفظة'),credit:t('Credit','آجل')})[s.pay]}<br>${esc(DB.settings.footer)}</div></div>`;
+}
+function showReceipt(s){
+  modal(t('Invoice','الفاتورة')+' '+s.no,receiptHTML(s),{ok:t('Print','طباعة'),onOk:()=>{$('#printarea').innerHTML=receiptHTML(s);window.print();return false}});
+}
+
+/* ---- Inventory ---- */
+V.inventory=el=>{
+  filt.iq=filt.iq||'';filt.icat=filt.icat||'';filt.ist=filt.ist||'';
+  el.innerHTML=`<div class="bar"><div class="sw grow">${ic('search')}<input id="iq" placeholder="${t('Search name, generic, barcode…','بحث بالاسم أو المادة الفعالة أو الباركود…')}" value="${esc(filt.iq)}"></div>
+   <select id="icat" style="width:auto"><option value="">${t('All categories','كل الأقسام')}</option>${CATS.map(c=>`<option value="${c[0]}" ${filt.icat===c[0]?'selected':''}>${t(c[0],c[1])}</option>`).join('')}</select>
+   <select id="ist" style="width:auto"><option value="">${t('All status','كل الحالات')}</option><option value="low" ${filt.ist==='low'?'selected':''}>${t('Low stock','ناقص')}</option><option value="near" ${filt.ist==='near'?'selected':''}>${t('Near expiry','قريب الانتهاء')}</option><option value="exp" ${filt.ist==='exp'?'selected':''}>${t('Expired','منتهي')}</option><option value="rx" ${filt.ist==='rx'?'selected':''}>Rx</option></select>
+   <button class="btn" onclick="exportInv()">${ic('down')} CSV</button><button class="btn p" onclick="medForm()">${ic('plus')} ${t('Add item','إضافة صنف')}</button></div><div id="itb"></div>`;
+  const draw=()=>{
+    const q=filt.iq.toLowerCase();
+    const list=DB.meds.filter(m=>(!q||[m.en,m.ar,m.generic,m.barcode].some(x=>(x||'').toLowerCase().includes(q)))&&(!filt.icat||m.cat===filt.icat)&&(!filt.ist||(filt.ist==='low'&&isLow(m))||(filt.ist==='near'&&nearExp(m).length)||(filt.ist==='exp'&&expiredB(m).length)||(filt.ist==='rx'&&m.rx)));
+    $('#itb').innerHTML=`<div class="muted" style="margin-bottom:8px">${list.length} ${t('items','صنف')} · ${t('Value','القيمة')}: ${money(list.reduce((a,m)=>a+stockAll(m)*m.cost,0))}</div>`+tableWrap([t('Item','الصنف'),t('Category','القسم'),t('Barcode','الباركود'),t('Cost','التكلفة'),t('Price','السعر'),t('Stock','المخزون'),t('Earliest expiry','أقرب انتهاء'),t('Status','الحالة'),''],
+     list.map(m=>{const nb=m.batches.filter(b=>b.qty>0).sort((a,b)=>a.exp.localeCompare(b.exp))[0];const st=expiredB(m).length?['bad',t('Expired batch','تشغيلة منتهية')]:nearExp(m).length?['warn',t('Near expiry','قريب الانتهاء')]:isLow(m)?['warn',t('Low','ناقص')]:['ok',t('OK','سليم')];
+      return `<tr><td><b>${esc(mname(m))}</b> ${m.rx?'<span class="badge acc">Rx</span>':''}<div class="muted" style="font-size:12.5px">${esc(m.generic)} · ${esc(m.loc||'')}</div></td><td><span class="badge" style="color:${catCol(m.cat)}">${catName(m.cat)}</span></td><td class="muted nowrap">${esc(m.barcode)}</td><td>${money(m.cost)}</td><td><b>${money(m.price)}</b></td><td><b>${stockAll(m)}</b> <small class="muted">/ ${t('min','حد')} ${m.min}</small></td><td class="nowrap">${nb?dd(nb.exp):'—'}</td><td><span class="badge ${st[0]}">${st[1]}</span></td>
+      <td class="nowrap"><button class="btn sm" onclick="altForm('${m.id}')" title="${t('Alternatives','البدائل')}">${ic('swap')}</button> <button class="btn sm" onclick="batchForm('${m.id}')" title="${t('Batches','التشغيلات')}">${ic('box')}</button> <button class="btn sm" onclick="medForm('${m.id}')">${ic('edit')}</button> <button class="btn sm" onclick="delMed('${m.id}')">${ic('trash')}</button></td></tr>`}));
+  };
+  $('#iq').oninput=e=>{filt.iq=e.target.value;draw()};$('#icat').onchange=e=>{filt.icat=e.target.value;draw()};$('#ist').onchange=e=>{filt.ist=e.target.value;draw()};draw();
+};
+function exportInv(){csv('inventory',[['Name EN','Name AR','Generic','Category','Barcode','Cost','Price','Stock','Min'],...DB.meds.map(m=>[m.en,m.ar,m.generic,m.cat,m.barcode,m.cost,m.price,stockAll(m),m.min])])}
+function medForm(id){
+  const m=id?medById(id):{en:'',ar:'',generic:'',cat:'Other',barcode:'',cost:0,price:0,min:5,loc:'',rx:false,batches:[]};
+  modal(id?t('Edit item','تعديل صنف'):t('New item','صنف جديد'),`<div class="fg">${field(t('Name (English)','الاسم (إنجليزي)'),'en',m.en)}${field(t('Name (Arabic)','الاسم (عربي)'),'ar',m.ar)}${field(t('Generic / active ingredient','المادة الفعالة'),'generic',m.generic)}
+   ${sel(t('Category','القسم'),'cat',CATS.map(c=>[c[0],t(c[0],c[1])]),m.cat)}${field(t('Barcode','الباركود'),'barcode',m.barcode)}${field(t('Shelf location','مكان الرف'),'loc',m.loc)}
+   ${field(t('Cost price','سعر التكلفة'),'cost',m.cost,'number','step="0.01" min="0"')}${field(t('Selling price','سعر البيع'),'price',m.price,'number','step="0.01" min="0"')}${field(t('Min stock alert','حد الطلب الأدنى'),'min',m.min,'number','min="0"')}
+   ${sel(t('Prescription only?','بروشتة فقط؟'),'rx',[['0',t('No','لا')],['1',t('Yes (Rx)','نعم (Rx)')]],m.rx?'1':'0')}
+   ${id?'':`<div class="full"><b>${t('Opening stock (optional)','رصيد افتتاحي (اختياري)')}</b></div>${field(t('Batch no.','رقم التشغيلة'),'bn','')}${field(t('Expiry date','تاريخ الانتهاء'),'bexp','','date')}${field(t('Quantity','الكمية'),'bq','','number','min="0"')}`}</div>`,{wide:true,onOk:ov=>{
+    const d={en:fv(ov,'en').trim(),ar:fv(ov,'ar').trim(),generic:fv(ov,'generic').trim(),cat:fv(ov,'cat'),barcode:fv(ov,'barcode').trim()||('62'+Date.now().toString().slice(-10)),loc:fv(ov,'loc'),cost:+fv(ov,'cost'),price:+fv(ov,'price'),min:+fv(ov,'min'),rx:fv(ov,'rx')==='1'};
+    if(!d.en&&!d.ar){toast(t('Name required','الاسم مطلوب'),'bad');return false}
+    if(DB.meds.some(x=>x.barcode===d.barcode&&x.id!==id)){toast(t('Barcode already used','الباركود مستخدم'),'bad');return false}
+    if(id)Object.assign(m,d);else{Object.assign(m,d,{id:'m'+uid(),unit:'Pack',batches:[]});const q=+fv(ov,'bq');if(q>0)m.batches.push({batch:fv(ov,'bn')||'OPEN',exp:fv(ov,'bexp')||ymd(addDays(365)),qty:q});DB.meds.push(m)}
+    persist();render();toast(t('Saved','تم الحفظ'))}});
+}
+function delMed(id){confirmD(t('Delete this item?','حذف هذا الصنف؟'),()=>{DB.meds=DB.meds.filter(m=>m.id!==id);persist();render()})}
+function batchForm(id){
+  const m=medById(id);
+  const ov=modal(mname(m)+' — '+t('Batches','التشغيلات'),`<div id="bl"></div><hr style="margin:14px 0;border:0;border-top:1px solid var(--line)"><b>${t('Add batch / adjust stock','إضافة تشغيلة / جرد')}</b><div class="fg" style="margin-top:8px">${field(t('Batch no.','رقم التشغيلة'),'bn')}${field(t('Expiry date','الانتهاء'),'bexp','','date')}${field(t('Quantity','الكمية'),'bq','','number','min="1"')}</div>`,{ok:t('Add batch','إضافة تشغيلة'),onOk:o=>{const q=+fv(o,'bq'),e=fv(o,'bexp');if(!(q>0)||!e){toast(t('Fill batch data','أكمل بيانات التشغيلة'),'bad');return false}m.batches.push({batch:fv(o,'bn')||'B'+uid().slice(0,4),exp:e,qty:q});persist();render()}});
+  const draw=()=>{$('#bl',ov).innerHTML=m.batches.length?`<div class="tw"><table><thead><tr><th>${t('Batch','التشغيلة')}</th><th>${t('Expiry','الانتهاء')}</th><th>${t('Qty','الكمية')}</th><th></th></tr></thead><tbody>${m.batches.map((b,i)=>`<tr><td>${esc(b.batch)}</td><td><span class="badge ${daysTo(b.exp)<0?'bad':daysTo(b.exp)<=DB.settings.expDays?'warn':'ok'}">${dd(b.exp)}</span></td><td><input type="number" min="0" value="${b.qty}" style="width:90px;padding:6px" data-i="${i}"></td><td><button class="btn sm" data-d="${i}">${ic('trash')}</button></td></tr>`).join('')}</tbody></table></div>`:`<div class="empty">${t('No batches','لا تشغيلات')}</div>`;
+    $$('[data-i]',ov).forEach(i=>i.onchange=()=>{m.batches[+i.dataset.i].qty=Math.max(0,+i.value);persist()});
+    $$('[data-d]',ov).forEach(b=>b.onclick=()=>{m.batches.splice(+b.dataset.d,1);persist();draw()})};draw();
+}
+function altForm(id){
+  const m=medById(id);const alts=DB.meds.filter(x=>x.id!==id&&x.generic&&x.generic!=='—'&&x.generic.toLowerCase()===m.generic.toLowerCase());
+  modal(t('Alternatives for ','بدائل ')+mname(m),`<p class="muted" style="margin-bottom:10px">${t('Same active ingredient:','نفس المادة الفعالة:')} <b>${esc(m.generic)}</b></p>`+(alts.length?alts.map(a=>`<div class="list-i"><div class="sp"><b>${esc(mname(a))}</b></div><span>${money(a.price)}</span><span class="badge ${stockOk(a)?'ok':'bad'}">${stockOk(a)}</span></div>`).join(''):`<div class="empty">${t('No alternatives in stock list','لا توجد بدائل مسجلة')}</div>`),{noFoot:true});
+}
+
+/* ---- Expiry & alerts ---- */
+V.expiry=el=>{
+  const al=alerts();
+  const rows=(list,fn)=>list.length?list.map(fn).join(''):`<div class="empty">${t('Nothing here ✓','لا شيء ✓')}</div>`;
+  el.innerHTML=`<div class="grid g4" style="margin-bottom:18px">${kpi('alert',t('Expired','منتهية'),al.exp.length,'#e5484d')}${kpi('clock',t('Near expiry','قريبة الانتهاء'),al.near.length,'#f59e0b',`≤ ${DB.settings.expDays} ${t('days','يوم')}`)}${kpi('box',t('Low stock','نواقص'),al.low.length,'#6c5ce7')}${kpi('heart',t('Refills due','روشتات مستحقة'),al.refills.length,'#0ea5e9')}</div>
+  <div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr))">
+   <div class="card"><h3 style="color:var(--bad)">${ic('alert')} ${t('Expired batches','تشغيلات منتهية')}</h3>${rows(al.exp,m=>expiredB(m).map(b=>`<div class="list-i"><div class="sp"><b>${esc(mname(m))}</b><div class="muted" style="font-size:12.5px">${b.batch} · ${dd(b.exp)}</div></div><span class="badge bad">${b.qty}</span><button class="btn sm" onclick="writeOff('${m.id}','${b.batch}')">${t('Write off','إعدام')}</button></div>`).join(''))}</div>
+   <div class="card"><h3>${ic('clock')} ${t('Expiring soon','تنتهي قريباً')}</h3>${rows(al.near,m=>nearExp(m).sort((a,b)=>a.exp.localeCompare(b.exp)).map(b=>`<div class="list-i"><div class="sp"><b>${esc(mname(m))}</b><div class="muted" style="font-size:12.5px">${b.batch} · ${dd(b.exp)}</div></div><span class="badge warn">${daysTo(b.exp)} ${t('d','يوم')}</span><span class="badge">${b.qty}</span></div>`).join(''))}</div>
+   <div class="card"><h3>${ic('box')} ${t('Reorder list','قائمة الطلب')}</h3>${al.low.length?`<div class="bar"><button class="btn sm p" onclick="reorderAll()">${ic('truck')} ${t('Create purchase order','إنشاء أمر شراء')}</button><button class="btn sm" onclick="csv('reorder',[['Item','Stock','Min'],...alerts().low.map(m=>[m.en,stockOk(m),m.min])])">${ic('down')} CSV</button></div>`:''}${rows(al.low,m=>`<div class="list-i"><div class="sp"><b>${esc(mname(m))}</b><div class="muted" style="font-size:12.5px">${t('Min','حد')} ${m.min}</div></div><span class="badge bad">${stockOk(m)}</span></div>`)}</div>
+   <div class="card"><h3>${ic('heart')} ${t('Prescription refills','تجديد الروشتات')}</h3>${rows(al.refills,r=>`<div class="list-i"><div class="sp"><b>${esc(r.patient)}</b><div class="muted" style="font-size:12.5px">${r.no} · ${dd(r.refill)}</div></div><button class="btn sm" onclick="go('rx')">${t('Open','فتح')}</button></div>`)}</div>
+  </div>`;
+};
+function writeOff(id,batch){confirmD(t('Write off this batch (remove from stock)?','إعدام هذه التشغيلة (إزالتها من المخزون)؟'),()=>{const m=medById(id);const b=m.batches.find(x=>x.batch===batch);if(b){DB.expenses.push({id:uid(),date:today(),cat:'Write-off',amount:b.qty*m.cost,note:mname(m)+' '+b.batch});b.qty=0}persist();render()})}
+function reorderAll(){const low=alerts().low;purchaseForm(low.map(m=>({medId:m.id,qty:Math.max(m.min*3-stockOk(m),1),cost:m.cost})))}
+
+/* ---- Sales ---- */
+V.sales=el=>{
+  filt.sq=filt.sq||'';
+  el.innerHTML=`<div class="bar"><div class="sw grow">${ic('search')}<input id="sq" placeholder="${t('Invoice no. / customer…','رقم الفاتورة / العميل…')}" value="${esc(filt.sq)}"></div><button class="btn" onclick="csv('sales',[['No','Date','Total','Returned','Payment'],...DB.sales.map(s=>[s.no,s.date,s.total,s.ret.amount,s.pay])])">${ic('down')} CSV</button></div><div id="stb"></div>`;
+  const draw=()=>{const q=filt.sq.toLowerCase();const list=DB.sales.filter(s=>!q||s.no.toLowerCase().includes(q)||(custById(s.cust)?.name||'').toLowerCase().includes(q)).slice().reverse().slice(0,200);
+    $('#stb').innerHTML=tableWrap(['#',t('Date','التاريخ'),t('Customer','العميل'),t('Items','الأصناف'),t('Payment','الدفع'),t('Total','الإجمالي'),t('Returned','مرتجع'),t('Cashier','الكاشير'),''],list.map(s=>`<tr><td><b>${s.no}</b></td><td class="nowrap">${dt(s.date)}</td><td>${esc(custById(s.cust)?.name||t('Walk-in','نقدي'))}</td><td>${s.items.reduce((a,i)=>a+i.qty,0)}</td><td><span class="badge ${s.pay==='credit'?'warn':'info'}">${s.pay}</span></td><td><b>${money(s.total)}</b></td><td>${s.ret.amount?`<span class="badge bad">${money(s.ret.amount)}</span>`:'—'}</td><td>${esc(userById(s.user)?.name||'')}</td><td class="nowrap"><button class="btn sm" onclick="showReceipt(DB.sales.find(x=>x.id==='${s.id}'))">${ic('print')}</button> <button class="btn sm" onclick="returnForm('${s.id}')">${ic('undo')}</button></td></tr>`));};
+  $('#sq').oninput=e=>{filt.sq=e.target.value;draw()};draw();
+};
+function returnForm(id){
+  const s=DB.sales.find(x=>x.id===id);
+  // group by med
+  const g={};s.items.forEach(i=>{g[i.medId]=g[i.medId]||{...i,qty:0};g[i.medId].qty+=i.qty});const ret=s.retQty||{};
+  modal(t('Return from ','مرتجع من ')+s.no,`<div class="tw"><table><thead><tr><th>${t('Item','الصنف')}</th><th>${t('Sold','المباع')}</th><th>${t('Returned','سبق إرجاعه')}</th><th>${t('Return now','إرجاع الآن')}</th></tr></thead><tbody>${Object.values(g).map(i=>{const r=ret[i.medId]||0;return `<tr><td>${esc(L()==='ar'?i.ar:i.name)}</td><td>${i.qty}</td><td>${r}</td><td><input type="number" min="0" max="${i.qty-r}" value="0" data-m="${i.medId}" style="width:80px;padding:6px"></td></tr>`}).join('')}</tbody></table></div>`,{ok:t('Confirm return','تأكيد المرتجع'),onOk:ov=>{
+    let amt=0,cost=0,any=false;s.retQty=s.retQty||{};
+    $$('[data-m]',ov).forEach(i=>{const q=Math.min(+i.value||0,+i.max);if(q>0){any=true;const m=medById(i.dataset.m);const it=s.items.find(x=>x.medId===i.dataset.m);amt+=q*it.price*(1-(s.disc/s.sub||0));cost+=q*it.cost;s.retQty[i.dataset.m]=(s.retQty[i.dataset.m]||0)+q;
+      if(m){const b=m.batches.find(b=>b.batch===(it.batch))||m.batches[0];if(b)b.qty+=q;else m.batches.push({batch:'RET',exp:ymd(addDays(365)),qty:q})}}});
+    if(!any){toast(t('Enter quantities','أدخل الكميات'),'bad');return false}
+    s.ret.amount+=amt;s.ret.cost+=cost;if(s.cust&&s.pay==='credit'){const c=custById(s.cust);c.debt=Math.max(0,c.debt-amt)}
+    persist();render();toast(t('Return recorded: ','تم المرتجع: ')+money(amt))}});
+}
+
+/* ---- Purchases ---- */
+V.purchases=el=>{
+  el.innerHTML=`<div class="bar"><span class="sp"></span><button class="btn p" onclick="purchaseForm()">${ic('plus')} ${t('New purchase invoice','فاتورة شراء جديدة')}</button></div>`+
+  tableWrap(['#',t('Date','التاريخ'),t('Supplier','المورد'),t('Items','الأصناف'),t('Total','الإجمالي'),t('Paid','المدفوع'),t('Due','المتبقي')],DB.purchases.slice().reverse().map(p=>`<tr><td><b>${p.no}</b></td><td>${dt(p.date)}</td><td>${esc(supById(p.supplier)?.name||'')}</td><td>${p.items.length}</td><td>${money(p.total)}</td><td>${money(p.paid)}</td><td>${p.total-p.paid>0?`<span class="badge warn">${money(p.total-p.paid)}</span>`:'—'}</td></tr>`));
+};
+function purchaseForm(pre=[]){
+  const rows=pre.map(p=>({...p,batch:'',exp:ymd(addDays(540))}));
+  const ov=modal(t('Purchase invoice','فاتورة شراء'),`<div class="fg" style="margin-bottom:14px">${sel(t('Supplier','المورد'),'sup',DB.suppliers.map(s=>[s.id,s.name]))}${field(t('Paid now','المدفوع الآن'),'paid','0','number','min="0" step="0.01"')}</div>
+    <div class="sw" style="margin-bottom:10px">${ic('search')}<input id="ps" placeholder="${t('Search item to add…','ابحث عن صنف لإضافته…')}" list="pdl" autocomplete="off"><datalist id="pdl">${DB.meds.map(m=>`<option value="${esc(mname(m))} | ${m.barcode}">`).join('')}</datalist></div><div id="prows"></div><div class="right b" style="font-size:18px;margin-top:10px" id="ptot"></div>`,{wide:true,ok:t('Save invoice','حفظ الفاتورة'),onOk:o=>{
+      if(!rows.length||rows.some(r=>!(r.qty>0)||!r.exp)){toast(t('Add items with quantity & expiry','أضف أصنافاً بكمية وتاريخ انتهاء'),'bad');return false}
+      const total=rows.reduce((a,r)=>a+r.qty*r.cost,0);const paid=Math.min(+fv(o,'paid')||0,total);
+      rows.forEach(r=>{const m=medById(r.medId);m.batches.push({batch:r.batch||'PO'+DB.seq.po,exp:r.exp,qty:+r.qty});m.cost=+r.cost});
+      DB.purchases.push({id:uid(),no:'PO-'+(DB.seq.po++),date:new Date().toISOString(),supplier:fv(o,'sup'),items:rows.map(r=>({medId:r.medId,en:medById(r.medId).en,qty:+r.qty,cost:+r.cost,batch:r.batch,exp:r.exp})),total,paid});
+      supById(fv(o,'sup')).balance+=total-paid;persist();render();toast(t('Purchase saved — stock updated','تم الحفظ وتحديث المخزون'))}});
+  const draw=()=>{$('#prows',ov).innerHTML=rows.length?`<div class="tw"><table><thead><tr><th>${t('Item','الصنف')}</th><th>${t('Qty','الكمية')}</th><th>${t('Cost','التكلفة')}</th><th>${t('Batch','التشغيلة')}</th><th>${t('Expiry','الانتهاء')}</th><th></th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td><b>${esc(mname(medById(r.medId)))}</b></td><td><input type="number" min="1" value="${r.qty}" style="width:80px;padding:6px" data-f="qty" data-i="${i}"></td><td><input type="number" min="0" step="0.01" value="${r.cost}" style="width:90px;padding:6px" data-f="cost" data-i="${i}"></td><td><input value="${esc(r.batch)}" style="width:100px;padding:6px" data-f="batch" data-i="${i}"></td><td><input type="date" value="${r.exp}" style="padding:6px" data-f="exp" data-i="${i}"></td><td><button class="btn sm" data-d="${i}">${ic('x')}</button></td></tr>`).join('')}</tbody></table></div>`:`<div class="empty">${t('No items yet','لم تتم إضافة أصناف')}</div>`;
+    $$('[data-f]',ov).forEach(i=>i.onchange=()=>{rows[+i.dataset.i][i.dataset.f]=i.type==='number'?+i.value:i.value;tot()});$$('[data-d]',ov).forEach(b=>b.onclick=()=>{rows.splice(+b.dataset.d,1);draw()});tot()};
+  const tot=()=>{$('#ptot',ov).textContent=t('Total: ','الإجمالي: ')+money(rows.reduce((a,r)=>a+r.qty*r.cost,0))};
+  $('#ps',ov).onchange=e=>{const bc=e.target.value.split('|').pop().trim();const m=DB.meds.find(x=>x.barcode===bc)||DB.meds.find(x=>x.barcode===e.target.value.trim());if(m){rows.push({medId:m.id,qty:1,cost:m.cost,batch:'',exp:ymd(addDays(540))});e.target.value='';draw()}};
+  draw();
+}
+
+/* ---- Suppliers / Customers ---- */
+function partyView(el,key,label,addLbl,debtLbl){
+  el.innerHTML=`<div class="bar"><span class="sp"></span><button class="btn p" onclick="partyForm('${key}')">${ic('plus')} ${addLbl}</button></div>`+
+  tableWrap([t('Name','الاسم'),t('Phone','الهاتف'),debtLbl,...(key==='customers'?[t('Points','النقاط')]:[]),''],DB[key].map(p=>{const v=key==='customers'?p.debt:p.balance;return `<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.phone||'')}</td><td>${v>0?`<span class="badge warn">${money(v)}</span>`:'—'}</td>${key==='customers'?`<td><span class="badge acc">${p.points||0}</span></td>`:''}<td class="nowrap">${v>0?`<button class="btn sm p" onclick="settle('${key}','${p.id}')">${t('Settle','تسوية')}</button> `:''}<button class="btn sm" onclick="partyForm('${key}','${p.id}')">${ic('edit')}</button> <button class="btn sm" onclick="delParty('${key}','${p.id}')">${ic('trash')}</button></td></tr>`}));
+}
+V.suppliers=el=>partyView(el,'suppliers','',t('Add supplier','إضافة مورد'),t('Balance due','مستحق للمورد'));
+V.customers=el=>partyView(el,'customers','',t('Add customer','إضافة عميل'),t('Debt','مديونية'));
+function partyForm(key,id){
+  const p=id?DB[key].find(x=>x.id===id):{name:'',phone:''};
+  modal(id?t('Edit','تعديل'):t('New','جديد'),`<div class="fg">${field(t('Name','الاسم'),'name',p.name)}${field(t('Phone','الهاتف'),'phone',p.phone)}</div>`,{onOk:ov=>{
+    if(!fv(ov,'name').trim()){toast(t('Name required','الاسم مطلوب'),'bad');return false}
+    if(id){p.name=fv(ov,'name');p.phone=fv(ov,'phone')}else DB[key].push(key==='customers'?{id:uid(),name:fv(ov,'name'),phone:fv(ov,'phone'),debt:0,points:0}:{id:uid(),name:fv(ov,'name'),phone:fv(ov,'phone'),balance:0});
+    persist();render()}});
+}
+function delParty(key,id){confirmD(t('Delete?','حذف؟'),()=>{DB[key]=DB[key].filter(x=>x.id!==id);persist();render()})}
+function settle(key,id){
+  const p=DB[key].find(x=>x.id===id);const f=key==='customers'?'debt':'balance';
+  modal(t('Settle account — ','تسوية حساب — ')+p.name,`<p style="margin-bottom:10px">${t('Outstanding','المستحق')}: <b>${money(p[f])}</b></p>${field(t('Amount','المبلغ'),'amt',p[f],'number','min="0" step="0.01"')}`,{onOk:ov=>{const a=Math.min(+fv(ov,'amt')||0,p[f]);if(a<=0)return false;p[f]-=a;if(key==='customers')DB.expenses.push({id:uid(),date:today(),cat:'_income',amount:-a,note:'Debt payment '+p.name});else DB.expenses.push({id:uid(),date:today(),cat:'Supplier payment',amount:a,note:p.name});persist();render();toast(t('Payment recorded','تم تسجيل الدفعة'))}});
+}
+
+/* ---- Prescriptions ---- */
+V.rx=el=>{
+  el.innerHTML=`<div class="bar"><span class="sp"></span><button class="btn p" onclick="rxForm()">${ic('plus')} ${t('New prescription','روشتة جديدة')}</button></div>`+
+  tableWrap(['#',t('Date','التاريخ'),t('Patient','المريض'),t('Doctor','الطبيب'),t('Medicines','الأدوية'),t('Next refill','التجديد القادم'),t('Status','الحالة'),''],DB.rx.slice().reverse().map(r=>`<tr><td><b>${r.no}</b></td><td>${dd(r.date)}</td><td><b>${esc(r.patient)}</b><div class="muted" style="font-size:12.5px">${esc(r.phone||'')}</div></td><td>${esc(r.doctor||'')}</td><td>${r.items.map(i=>`<div style="font-size:13px">• ${esc(mname(medById(i.medId)||{en:'?'}))} ×${i.qty} <span class="muted">${esc(i.dose||'')}</span></div>`).join('')}</td><td>${r.refill?`<span class="badge ${daysTo(r.refill)<=3?'warn':''}">${dd(r.refill)}</span>`:'—'}</td><td><span class="badge ${r.status==='done'?'ok':'info'}">${r.status==='done'?t('Dispensed','تم الصرف'):t('Pending','قيد الانتظار')}</span></td><td class="nowrap"><button class="btn sm p" onclick="dispenseRx('${r.id}')">${t('Dispense','صرف')}</button> <button class="btn sm" onclick="DB.rx=DB.rx.filter(x=>x.id!=='${r.id}');persist();render()">${ic('trash')}</button></td></tr>`));
+};
+function rxForm(){
+  const items=[];
+  const ov=modal(t('New prescription','روشتة جديدة'),`<div class="fg">${field(t('Patient name','اسم المريض'),'patient')}${field(t('Phone','الهاتف'),'phone')}${field(t('Doctor','الطبيب'),'doctor')}${field(t('Refill date (reminder)','موعد التجديد (تذكير)'),'refill','','date')}<div class="full">${field(t('Notes','ملاحظات'),'notes')}</div></div>
+   <div class="sw" style="margin:14px 0 8px">${ic('search')}<input id="rs" list="rdl" placeholder="${t('Add medicine…','أضف دواء…')}"><datalist id="rdl">${DB.meds.map(m=>`<option value="${esc(mname(m))} | ${m.barcode}">`).join('')}</datalist></div><div id="rit"></div>`,{wide:true,onOk:o=>{
+    if(!fv(o,'patient').trim()||!items.length){toast(t('Patient and medicines required','المريض والأدوية مطلوبة'),'bad');return false}
+    DB.rx.push({id:uid(),no:'RX-'+(DB.seq.rx++),date:today(),patient:fv(o,'patient'),phone:fv(o,'phone'),doctor:fv(o,'doctor'),notes:fv(o,'notes'),refill:fv(o,'refill'),items,status:'pending'});persist();render()}});
+  const draw=()=>{const w=interactions(items.map(i=>i.medId));$('#rit',ov).innerHTML=(w.length?`<div class="badge bad" style="margin-bottom:8px">⚠ ${t('Interaction','تداخل دوائي')}: ${w.join(' | ')}</div>`:'')+items.map((it,i)=>`<div class="list-i"><b class="sp">${esc(mname(medById(it.medId)))}</b><input type="number" min="1" value="${it.qty}" style="width:70px;padding:6px" data-q="${i}"><input placeholder="${t('Dose','الجرعة')}" value="${esc(it.dose)}" style="width:160px;padding:6px" data-dose="${i}"><button class="btn sm" data-d="${i}">${ic('x')}</button></div>`).join('');
+    $$('[data-q]',ov).forEach(x=>x.onchange=()=>items[+x.dataset.q].qty=+x.value);$$('[data-dose]',ov).forEach(x=>x.onchange=()=>items[+x.dataset.dose].dose=x.value);$$('[data-d]',ov).forEach(x=>x.onclick=()=>{items.splice(+x.dataset.d,1);draw()})};
+  $('#rs',ov).onchange=e=>{const bc=e.target.value.split('|').pop().trim();const m=DB.meds.find(x=>x.barcode===bc);if(m){items.push({medId:m.id,qty:1,dose:''});e.target.value='';draw()}};draw();
+}
+function dispenseRx(id){
+  const r=DB.rx.find(x=>x.id===id);cart=[];let miss=[];r.items.forEach(i=>{const m=medById(i.medId);if(m&&stockOk(m)>=i.qty)cart.push({id:i.medId,qty:i.qty,price:m.price});else miss.push(m?mname(m):'?')});
+  r.status='done';if(r.refill&&daysTo(r.refill)<=0)r.refill=ymd(addDays(30));persist();
+  if(miss.length)toast(t('Out of stock: ','غير متوفر: ')+miss.join(', '),'warn');
+  const c=DB.customers.find(x=>x.phone&&x.phone===r.phone);if(c)cartOpts.cust=c.id;
+  go('pos');
+}
+
+/* ---- Expenses ---- */
+V.expenses=el=>{
+  const list=DB.expenses.filter(e=>e.cat!=='_income').slice().reverse();const tot=list.reduce((a,e)=>a+e.amount,0);
+  el.innerHTML=`<div class="bar"><div class="card" style="padding:10px 16px"><span class="muted">${t('Total expenses','إجمالي المصروفات')}:</span> <b>${money(tot)}</b></div><span class="sp"></span><button class="btn p" onclick="expForm()">${ic('plus')} ${t('Add expense','إضافة مصروف')}</button></div>`+
+  tableWrap([t('Date','التاريخ'),t('Category','البند'),t('Amount','المبلغ'),t('Note','ملاحظة'),''],list.map(e=>`<tr><td>${dd(e.date)}</td><td><span class="badge">${esc(e.cat)}</span></td><td><b>${money(e.amount)}</b></td><td>${esc(e.note||'')}</td><td><button class="btn sm" onclick="DB.expenses=DB.expenses.filter(x=>x.id!=='${e.id}');persist();render()">${ic('trash')}</button></td></tr>`));
+};
+function expForm(){modal(t('New expense','مصروف جديد'),`<div class="fg">${sel(t('Category','البند'),'cat',['Rent','Salaries','Electricity','Water','Internet','Supplies','Maintenance','Other'].map(x=>[x,x]))}${field(t('Amount','المبلغ'),'amount','','number','min="0" step="0.01"')}${field(t('Date','التاريخ'),'date',today(),'date')}${field(t('Note','ملاحظة'),'note')}</div>`,{onOk:o=>{const a=+fv(o,'amount');if(!(a>0)){toast(t('Enter amount','أدخل المبلغ'),'bad');return false}DB.expenses.push({id:uid(),date:fv(o,'date'),cat:fv(o,'cat'),amount:a,note:fv(o,'note')});persist();render()}})}
+
+/* ---- Reports ---- */
+V.reports=el=>{
+  filt.rf=filt.rf||ymd(addDays(-29));filt.rt=filt.rt||today();
+  el.innerHTML=`<div class="bar">${field(t('From','من'),'rf',filt.rf,'date')}${field(t('To','إلى'),'rt',filt.rt,'date')}<span class="sp"></span><button class="btn" id="rexp">${ic('down')} CSV</button></div><div id="rbody"></div>`;
+  const draw=()=>{
+    const f=filt.rf,to=filt.rt;const S=DB.sales.filter(s=>ymd(s.date)>=f&&ymd(s.date)<=to);const E=DB.expenses.filter(e=>e.cat!=='_income'&&e.cat!=='Supplier payment'&&e.date>=f&&e.date<=to);
+    const rev=S.reduce((a,s)=>a+saleNet(s),0),cogs=S.reduce((a,s)=>a+saleCost(s),0),exp=E.reduce((a,e)=>a+e.amount,0),gp=rev-cogs;
+    const byPay={};S.forEach(s=>byPay[s.pay]=(byPay[s.pay]||0)+saleNet(s));
+    const byCat={};S.forEach(s=>s.items.forEach(i=>{const m=medById(i.medId);const c=m?m.cat:'Other';byCat[c]=(byCat[c]||0)+i.qty*i.price}));
+    const byUser={};S.forEach(s=>{const u=userById(s.user)?.name||'?';byUser[u]=(byUser[u]||0)+saleNet(s)});
+    const prod={};S.forEach(s=>s.items.forEach(i=>{const p=prod[i.medId]=prod[i.medId]||{q:0,r:0,p:0};p.q+=i.qty;p.r+=i.qty*i.price;p.p+=i.qty*(i.price-i.cost)}));
+    const tp=Object.entries(prod).sort((a,b)=>b[1].r-a[1].r).slice(0,10);
+    const days=[];for(let d=new Date(f+'T00:00:00');ymd(d)<=to&&days.length<31;d=addDays(1,d))days.push(ymd(d));
+    const dv=days.map(d=>S.filter(s=>ymd(s.date)===d).reduce((a,s)=>a+saleNet(s),0));
+    const stockVal=DB.meds.reduce((a,m)=>a+stockAll(m)*m.cost,0),stockSell=DB.meds.reduce((a,m)=>a+stockAll(m)*m.price,0);
+    $('#rbody').innerHTML=`<div class="grid g4" style="margin-bottom:18px">${kpi('wallet',t('Net revenue','صافي الإيراد'),money(rev),'#0f9d7a',S.length+' '+t('invoices','فاتورة'))}${kpi('tag',t('Cost of goods','تكلفة البضاعة'),money(cogs),'#f59e0b')}${kpi('chart',t('Gross profit','مجمل الربح'),money(gp),'#6c5ce7',rev?Math.round(gp/rev*100)+'%':'')}${kpi('shield',t('Net profit','صافي الربح'),money(gp-exp),gp-exp>=0?'#16a34a':'#e5484d',t('after expenses','بعد المصروفات')+' '+money(exp))}</div>
+    <div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))">
+     <div class="card" style="grid-column:1/-1"><h3>${ic('chart')} ${t('Daily sales','المبيعات اليومية')}</h3>${barChart(dv,days.map(d=>d.slice(8)))}</div>
+     <div class="card"><h3>${t('By payment method','حسب طريقة الدفع')}</h3>${donut(Object.entries(byPay).map(([k,v],i)=>({l:k,v,c:CCOL[i]})))}</div>
+     <div class="card"><h3>${t('By category','حسب القسم')}</h3>${donut(Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([k,v])=>({l:catName(k),v,c:catCol(k)})))}</div>
+     <div class="card"><h3>${t('Top products','الأصناف الأعلى')}</h3>${tableWrap([t('Item','الصنف'),t('Qty','الكمية'),t('Revenue','الإيراد'),t('Profit','الربح')],tp.map(([id,p])=>`<tr><td>${esc(mname(medById(id)||{en:'?'}))}</td><td>${p.q}</td><td>${money(p.r)}</td><td>${money(p.p)}</td></tr>`))}</div>
+     <div class="card"><h3>${t('Cashier performance','أداء الكاشير')}</h3>${Object.entries(byUser).map(([u,v])=>`<div class="list-i"><b class="sp">${esc(u)}</b><b>${money(v)}</b></div>`).join('')||'—'}<h3 style="margin-top:20px">${ic('box')} ${t('Inventory valuation','تقييم المخزون')}</h3><div class="list-i"><span class="sp">${t('At cost','بالتكلفة')}</span><b>${money(stockVal)}</b></div><div class="list-i"><span class="sp">${t('At selling price','بسعر البيع')}</span><b>${money(stockSell)}</b></div><div class="list-i"><span class="sp">${t('Expected margin','هامش متوقع')}</span><b>${money(stockSell-stockVal)}</b></div></div>
+    </div>`;
+    $('#rexp').onclick=()=>csv('report',[['Invoice','Date','Net','Cost','Profit','Payment'],...S.map(s=>[s.no,s.date,saleNet(s),saleCost(s),saleNet(s)-saleCost(s),s.pay])]);
+  };
+  $('[name=rf]',el).onchange=e=>{filt.rf=e.target.value;draw()};$('[name=rt]',el).onchange=e=>{filt.rt=e.target.value;draw()};draw();
+};
+
+/* ---- Users ---- */
+V.users=el=>{
+  el.innerHTML=`<div class="bar"><span class="sp"></span><button class="btn p" onclick="userForm()">${ic('plus')} ${t('Add user','إضافة مستخدم')}</button></div>`+tableWrap([t('Name','الاسم'),t('Role','الصلاحية'),''],DB.users.map(u=>`<tr><td><b>${esc(u.name)}</b></td><td><span class="badge acc">${roleName(u.role)}</span></td><td class="nowrap"><button class="btn sm" onclick="userForm('${u.id}')">${ic('edit')}</button> ${u.id!==ME.id?`<button class="btn sm" onclick="DB.users=DB.users.filter(x=>x.id!=='${u.id}');persist();render()">${ic('trash')}</button>`:''}</td></tr>`));
+};
+function userForm(id){const u=id?userById(id):{name:'',role:'cashier',pin:''};
+  modal(id?t('Edit user','تعديل مستخدم'):t('New user','مستخدم جديد'),`<div class="fg">${field(t('Name','الاسم'),'name',u.name)}${sel(t('Role','الصلاحية'),'role',[['admin',roleName('admin')],['pharmacist',roleName('pharmacist')],['cashier',roleName('cashier')]],u.role)}${field(t('PIN (4+ digits)','الرقم السري (٤ أرقام+)'),'pin',u.pin,'text','inputmode="numeric"')}</div>`,{onOk:o=>{if(!fv(o,'name').trim()||fv(o,'pin').length<4){toast(t('Name & 4+ digit PIN required','الاسم ورقم سري ٤ أرقام على الأقل'),'bad');return false}
+    const d={name:fv(o,'name'),role:fv(o,'role'),pin:fv(o,'pin')};if(id)Object.assign(u,d);else DB.users.push({id:uid(),...d});persist();render()}})}
+
+/* ---- Settings ---- */
+V.settings=el=>{
+  const s=DB.settings;
+  el.innerHTML=`<div class="grid g2" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))"><div class="card"><h3>${ic('pill')} ${t('Pharmacy profile','بيانات الصيدلية')}</h3><div class="fg">${field(t('Name (Arabic)','الاسم (عربي)'),'name',s.name)}${field(t('Name (English)','الاسم (إنجليزي)'),'nameEn',s.nameEn)}${field(t('Phone','الهاتف'),'phone',s.phone)}${field(t('License no.','رقم الترخيص'),'license',s.license)}<div class="full">${field(t('Address','العنوان'),'address',s.address)}</div><div class="full">${field(t('Receipt footer','تذييل الفاتورة'),'footer',s.footer)}</div></div></div>
+  <div class="card"><h3>${ic('cog')} ${t('System','النظام')}</h3><div class="fg">${field(t('Currency','العملة'),'currency',s.currency)}${field(t('Tax %','الضريبة %'),'tax',s.tax,'number','min="0" step="0.1"')}${field(t('Expiry alert (days)','تنبيه الصلاحية (أيام)'),'expDays',s.expDays,'number','min="1"')}</div>
+   <button class="btn p" style="margin-top:16px" id="ssave">${ic('check')} ${t('Save settings','حفظ الإعدادات')}</button>
+   <h3 style="margin-top:28px">${ic('shield')} ${t('Backup & data','النسخ الاحتياطي والبيانات')}</h3><div class="row" style="flex-wrap:wrap"><button class="btn" id="bk">${ic('down')} ${t('Export backup','تصدير نسخة')}</button><label class="btn" style="cursor:pointer">${ic('up')} ${t('Import','استيراد')}<input type="file" id="bi" accept=".json" hidden></label><button class="btn d" id="rs">${t('Reset demo data','إعادة بيانات تجريبية')}</button></div>
+   <p class="muted" style="margin-top:10px;font-size:13px">${t('Data is stored locally in this browser. Export regular backups.','البيانات محفوظة محلياً في هذا المتصفح. صدّر نسخة احتياطية بانتظام.')}</p></div></div>`;
+  $('#ssave').onclick=()=>{['name','nameEn','phone','license','address','footer','currency'].forEach(k=>s[k]=$(`[name=${k}]`,el).value);s.tax=+$('[name=tax]',el).value||0;s.expDays=+$('[name=expDays]',el).value||90;persist();toast(t('Saved','تم الحفظ'));render()};
+  $('#bk').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(DB)],{type:'application/json'}));a.download='roshetta-backup-'+today()+'.json';a.click()};
+  $('#bi').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.meds||!d.settings)throw 0;DB=d;persist();applyLang();ME=DB.users.find(u=>u.id===ME.id)||DB.users[0];render();toast(t('Imported','تم الاستيراد'))}catch(x){toast(t('Invalid file','ملف غير صالح'),'bad')}};r.readAsText(f)};
+  $('#rs').onclick=()=>confirmD(t('Replace all data with demo data?','استبدال كل البيانات ببيانات تجريبية؟'),()=>{const l=DB.settings.lang,th=DB.settings.theme;DB=seed();DB.settings.lang=l;DB.settings.theme=th;persist();ME=DB.users[0];render()});
+};
+
+/* ---------- boot ---------- */
+document.addEventListener('keydown',e=>{
+  if(!ME)return;
+  if(e.key==='F2'&&VIEW==='pos'){e.preventDefault();$('#pq')?.focus()}
+  if(e.key==='F9'&&VIEW==='pos'){e.preventDefault();checkout()}
+  if(e.key==='Escape')$$('.ov').pop()?.remove();
+});
+function boot(){$('#login').hidden=true;$('#app').hidden=false;const h=location.hash.slice(1);if(h&&NAV.find(n=>n[0]===h&&n[3].includes(ME.role)))VIEW=h;else VIEW='dashboard';render()}
+load();applyLang();
+const su=sessionStorage.getItem('rs_u');ME=su?DB.users.find(u=>u.id===su):null;
+ME?boot():showLogin();
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(ME&&h&&h!==VIEW&&V[h]){VIEW=h;render()}});
+</script>
+</body>
+</html>
